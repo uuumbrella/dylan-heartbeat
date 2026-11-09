@@ -348,6 +348,7 @@ function getLastUserTime(messages) {
       // 批注 2026-07-15：兼容 Kelivo 时间前缀 "YYYY-MM-DDHH:mm"；
       // 旧的 "YYYY-MM-DD HH:mm" 仍然可用，避免无空格时间导致 wake-up 误判没有用户时间。
       const parsed = parseTimelineTimestamp(content);
+      console.log("尝试解析用户时间:", content.slice(0, 50), "→ 结果:", parsed);
       if (parsed) return parsed;
     }
   }
