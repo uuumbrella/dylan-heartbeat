@@ -337,7 +337,15 @@ function parseTimelineTimestamp(value) {
   const match = text.match(/（?\s*(\d{4})([-/])(\d{1,2})\2(\d{1,2})(?:[ T]?)(\d{1,2})[:：](\d{2})/);
   if (!match) return null;
   const [, yyyy, , month, day, hour, minute] = match;
-  return zonedWallTimeToDate({ year: yyyy, month, day, hour, minute }, TIME_ZONE);
+  
+  // 先尝试用时区转换
+  const result = zonedWallTimeToDate({ year: yyyy, month, day, hour, minute }, TIME_ZONE);
+  if (result) return result;
+  
+  // 降级：zonedWallTimeToDate 返回 null 时，直接按本地时间构造 Date
+  const fallback = new Date(Number(yyyy), Number(month) - 1, Number(day), Number(hour), Number(minute));
+  console.warn(`zonedWallTimeToDate 解析失败，降级使用本地时间: ${yyyy}-${month}-${day} ${hour}:${minute}`);
+  return fallback;
 }
 
 function getLastUserTime(messages) {
