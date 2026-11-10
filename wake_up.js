@@ -413,14 +413,26 @@ async function runWakeUp() {
   console.log("开始自动唤醒");
   console.log("==========================\n");
 
-  const messages = loadTimelineMessages();
-  if (!messages) return;
+const messages = loadTimelineMessages();
+if (!messages) return;
 
-  const lastUserTime = getLastUserTime(messages);
-  if (!lastUserTime) {
-    console.log("未找到用户时间");
-    return;
-  }
+// 诊断日志：输出时间线状态
+console.log("时间线消息总数:", messages.length);
+const userMessages = messages.filter(m => m.role === "user");
+console.log("user 消息数:", userMessages.length);
+const lastUserMsg = [...messages].reverse().find(m => m.role === "user");
+if (lastUserMsg) {
+  const content = normalizeContentToText(lastUserMsg.content);
+  console.log("最后一条user消息前60字:", content.slice(0, 60));
+  console.log("尝试解析该消息时间...");
+}
+
+const lastUserTime = getLastUserTime(messages);
+if (!lastUserTime) {
+  console.log("未找到用户时间");
+  return;
+}
+console.log("成功解析用户时间:", lastUserTime);
 
   const now = new Date();
   const diffMinutes = Math.floor((now - lastUserTime) / 1000 / 60);
